@@ -1,0 +1,30 @@
+siteproof/
+├── supabase/
+│   └── schema.sql
+├── scripts/
+│   └── seed.mjs
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── log/
+│   │   └── new/page.tsx
+│   ├── p/
+│   │   └── [token]/
+│   │       └── page.tsx
+│   └── api/
+│       └── cron/
+│           └── weekly/
+│               └── route.ts
+├── components/
+│   ├── dashboard-nav.tsx
+│   └── reward-pop.tsx
+├── lib/
+│   ├── actions.ts
+│   ├── streak.ts
+│   ├── emails.ts
+│   └── supabase/
+│       └── server.ts
+├── .env.local.example
+├── next.config.ts
+├── package.json
+└── README.md
