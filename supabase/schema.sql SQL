@@ -1,0 +1,60 @@
+create extension if not exists "uuid-ossp";
+create extension if not exists "pgcrypto";
+
+create table profiles (
+  id uuid primary key references auth.users not null,
+  full_name text,
+  company text not null,
+  zip_code text not null check (char_length(zip_code) = 5),
+  logo_url text,
+  primary_color text default '#10b981',
+  custom_domain text unique,
+  subscription_tier text default 'free',
+  created_at timestamptz default now()
+);
+
+create table projects (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references profiles not null,
+  client_name text not null,
+  address text not null,
+  share_token text unique not null default encode(gen_random_bytes(16), 'hex'),
+  created_at timestamptz default now()
+);
+
+create table daily_logs (
+  id uuid primary key default uuid_generate_v4(),
+  project_id uuid references projects on delete cascade not null,
+  user_id uuid references profiles not null,
+  log_date date not null default current_date,
+  photo_urls text[] default '{}',
+  notes text,
+  created_at timestamptz default now(),
+  unique(project_id, log_date)
+);
+
+create table streaks (
+  user_id uuid primary key references profiles,
+  current_streak int default 0,
+  longest_streak int default 0,
+  last_log_date date,
+  multiplier numeric default 1.0
+);
+
+create table reward_drops (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references profiles not null,
+  reward_type text not null,
+  message text not null,
+  created_at timestamptz default now()
+);
+
+create index idx_daily_logs_user_date on daily_logs(user_id, log_date);
+create index idx_profiles_zip on profiles(zip_code);
+create index idx_projects_share_token on projects(share_token);
+
+create materialized view leaderboard as
+select p.zip_code, count(distinct dl.project_id) as activity_score,
+rank() over (order by count(distinct dl.project_id) desc) as rank,
+count(distinct p.id) as contractors_in_zip
+from profiles p left join daily_logs dl on p.id = dl.user_id group by p.zip_code;
