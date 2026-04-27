@@ -1,0 +1,11 @@
+{
+  "name": "siteproof",
+  "version": "1.0.0",
+  "scripts": { "dev": "next dev", "build": "next build" },
+  "dependencies": {
+    "next": "15",
+    "@supabase/supabase-js": "^2",
+    "resend": "^4",
+    "canvas-confetti": "^1"
+  }
+}
